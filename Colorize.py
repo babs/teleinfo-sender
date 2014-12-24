@@ -31,6 +31,7 @@ def init_root_logger(format="%(asctime)s %(name)-15s %(levelname)-8s %(message)s
     sh.setFormatter(formatter)
     log.setLevel(level)
     log.addHandler(sh)
+    return log
 
 def colorize(txt, fgcol=None, bgcol=None, bold=None, underline=None, blink=None, reverse=None, stroke=None, dark=None, light=True, fglight=None, bglight=None, **kwarg):
     " => colorize(text, foreground color, background color, bold, underline, blink, reverse, stroke, light, background light, foreground light) returns text with escapes codes\npossible colors are black, red, green, yellow, blue, pink, cyan and white."
