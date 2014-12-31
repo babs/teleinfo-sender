@@ -1,5 +1,4 @@
 #!/usr/bin/python
-
 import sys, serial, datetime, time, threading, urllib2, json
 from Colorize import colorize
 from Queue import Queue
@@ -8,17 +7,33 @@ from Queue import Queue
 
 class glob:
     workthread = None
-    destination = None 
+    destination = []
     trames = Queue()
     counter = 0L
     counterlock = threading.Lock()
     wrap_at = 60
 
 def checksum(line):
-    return chr((sum(map(lambda x: ord(x), " ".join(line.split(" ")[:2]))) & 0x3F) + 0x20)
+    return chr((
+        sum(
+            map(
+                lambda x: ord(x),
+                 " ".join(line.split(" ")[:2]))
+            ) & 0x3F)
+         + 0x20)
 
 def push_data(trame):
-    return urllib2.urlopen(urllib2.Request(glob.destination, json.dumps(trame), {'Content-Type':'application/json'})).read()
+    exc = {}
+    for dest in glob.destination:
+        try:
+            urllib2.urlopen(urllib2.Request(
+                dest,
+                json.dumps(trame),
+                {'Content-Type':'application/json'})).read()
+        except Exception, e:
+            exc[dest] = e
+    if len(exc) > 0:
+        raise Exception("Push failed!", exc)
 
 def write_progress(c):
     with glob.counterlock:
@@ -43,13 +58,13 @@ def worker():
 
 def main():
     if len(sys.argv) > 1:
-        glob.destination = sys.argv[1]
+        glob.destination = sys.argv[1:]
     else:
         print colorize("no destination set!", fg="red", bold=True)
         sys.exit(1)
 
     print colorize("Starting worker", fg="green", bold=True)
-    print colorize("[*] sending to %s"%glob.destination, fg="green")
+    print colorize("[*] sending to %s"%str(glob.destination), fg="green")
     glob.workthread = threading.Thread(target=worker)
     glob.workthread.daemon = True
     glob.workthread.start()
@@ -84,19 +99,6 @@ def main():
         if c == "\x0d": # Fin de ligne
             line = "".join(buf)
             trame.append("\x0a" + line + "\x0d")
-            if False:
-                if not checksum(line) == line[-1]: bg="red"
-                bold = bg = fg = None
-                if "PAPP" in line:
-                    fg="red"
-                    bold=True
-                if "ADCO" in line:
-                    fg="green"
-                    bold=True
-                sys.stdout.write(colorize(line, fg=fg, bg=bg, bglight=False, fglight=True, bold=bold) + "\n")
-                continue
-            #except:
-            #    pass
         buf.append(c)
 
 if __name__ == "__main__":
