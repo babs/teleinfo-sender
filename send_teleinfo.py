@@ -70,7 +70,7 @@ def main():
     glob.workthread.start()
 
     print colorize("Starting collection", fg="green", bold=True)
-    ser = serial.Serial("/dev/ttyUSB0", 115200)
+    ser = serial.Serial("/dev/ttyUSB0", 1200)
     buf = []
     trame = []
     tramets = None

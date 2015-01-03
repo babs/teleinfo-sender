@@ -8,7 +8,7 @@ def checksum(line):
 
 def main():
     print colorize("starting", fg="red")
-    ser = serial.Serial("/dev/ttyUSB0", 115200)
+    ser = serial.Serial("/dev/ttyUSB0", 1200)
     buf = []
     laststart = None
     while True:
