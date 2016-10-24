@@ -10,7 +10,7 @@ exmaple:
     ./send_teleinfo.py http://192.168.3.5/teleinfo/post.php 192.168.3.255:2101
     
     
- ### TODO
+### TODO
  
  - Rewrite the script (currently working but kludgy)
     
